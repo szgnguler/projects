@@ -1,0 +1,32 @@
+FROM pardus/yirmibir
+
+#Apache Kurulumu
+RUN apt-get update \
+    && apt-get -y --no-install-recommends install php libapache2-mod-php php-mysql wget apache2 libxml2-dev wget ca-certificates php7.3 libapache2-mod-php php-mysql && apt-get -y clean autoremove \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+#setup needed filesystem locations
+RUN mkdir -p /var/lock/apache2 \
+             /var/run/apache2 \
+             /var/log/apache2 \
+    && chown www-data:www-data \
+             /var/lock/apache2 \
+             /var/run/apache2 \
+             /var/log/apache2
+
+EXPOSE 80
+RUN echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf && a2enconf fqdn
+RUN cd var/www/html
+RUN rm var/www/html/index.html
+RUN wget https://tr.wordpress.org/latest-tr_TR.tar.gz
+RUN tar -xvf latest-tr_TR.tar.gz -C /var/www/html/
+RUN cd var/www/html/wordpress
+RUN mv var/www/html/wordpress/* /var/www/html/
+RUN cd var/www/html/
+RUN chmod -R 777 /var/www/html
+RUN rmdir var/www/html/wordpress/
+RUN rm -f latest-tr_TR.tar.gz
+RUN cd
+
+RUN service apache2 start
+CMD ["apachectl", "-D", "FOREGROUND"]
