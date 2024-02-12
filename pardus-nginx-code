@@ -1,0 +1,16 @@
+#Imaj yapılandırması icin once Pardus 21 Container imajı alinacak
+FROM pardus/yirmibir
+######################################################################
+RUN apt-get update \
+    && apt-get -y --no-install-recommends install sudo nano wget&& apt-get -y clean autoremove \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+######################################################################
+RUN apt-get update \
+    && apt-get -y --no-install-recommends install sudo nginx php php-fpm && apt-get -y clean autoremove \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#######################################################################
+
+EXPOSE 80
+
+########################################################################
+CMD "nginx" "-g" "daemon off;"
